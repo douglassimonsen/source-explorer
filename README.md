@@ -6,3 +6,4 @@ TODO:
 5. Offer ability to convert PowerBI queries to actual views
 6. Use psycopg2 transactions to identify transform steps in Python
 7. Look for other ways to identify Python transforms. Maybe allow manual verification of Python stuff?
+8. Parse connection info in PowerBI to identify appropriate DB
