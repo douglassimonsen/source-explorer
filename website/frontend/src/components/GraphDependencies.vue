@@ -8,7 +8,10 @@ import axios from 'axios';
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
 cytoscape.use( dagre );
-
+const COLORS = {
+  'VIEW': 'green',
+  'BASE TABLE': 'blue'
+};
 @Options({
   props: {
   },
@@ -16,23 +19,43 @@ cytoscape.use( dagre );
 export default class HelloWorld extends Vue {
   mounted () {
    axios.get('http://127.0.0.1:5000/api/views/redshift', {headers: {'Access-Control-Allow-Origin': '*'}}).then(function(resp){
-    debugger;     
-   })
-    cytoscape({
-      // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-      container: document.getElementById("graph"),
-      elements: [
-        { data: { id: 'a' } },
-        { data: { id: 'b' } },
-        {
-          data: {
-            id: 'ab',
-            source: 'a',
-            target: 'b'
-          }
-        }
-      ],
+    const nodes = resp.data.objects.map(function(x){
+      return {
+        data: {
+          id: `${x.table_schema}.${x.table_name}`,
+          name: `${x.table_schema}.${x.table_name}`,
+          color: COLORS[x.table_type],
+        },
+      };
     });
+    const edges = resp.data.dependencies.map(function(x){
+      return {
+        data: {
+          id: `${x.parent_schema}.${x.parent_table}-${x.child_schema}.${x.child_view}`,
+          source: `${x.parent_schema}.${x.parent_table}`,
+          target: `${x.child_schema}.${x.child_view}`,
+        }
+      }
+    });
+    cytoscape({
+      container: document.getElementById("graph"),
+      elements: nodes.concat(edges),
+      layout: {
+        name: 'dagre',
+      },
+      style: [
+        {
+          selector: 'node',
+          style: {
+            shape: 'rectangle',
+            'background-color': 'data(color)',
+            label: 'data(id)',
+          },
+        },
+      ],
+    });    
+   })
+    
   }
 }
 </script>
