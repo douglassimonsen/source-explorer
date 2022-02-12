@@ -21,3 +21,4 @@ create view test.view2 as (
 	on s1.name = s2.name
 	group by s1.name
 );
+create materialized view test.mview1 as (select * from test.source1);
