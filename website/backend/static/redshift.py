@@ -1,7 +1,8 @@
 import flask
 from app import app
 import utils
-redshift_query = open(r'website\static\view_dependencies.sql').read()
+import pathlib
+redshift_query = open(pathlib.Path(__file__).parent.joinpath('view_dependencies.sql')).read()
 
 
 @app.route('/api/views/redshift')
